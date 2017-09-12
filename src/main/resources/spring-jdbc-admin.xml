@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+    <bean id="db_admin" parent="parentDataSource">
+        <property name="jdbcUrl">
+            <value>${jdbc_admin.url}</value>
+        </property>
+        <property name="user">
+            <value>${jdbc_admin.username}</value>
+        </property>
+        <property name="password">
+            <value>${jdbc_admin.password}</value>
+        </property>
+    </bean>
+
+    <bean id="sqlSessionFactoryAdmin" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="db_admin"/>
+        <property name="typeAliasesPackage" value="innshine.web.official.website.entity"/>
+        <property name="mapperLocations" value="classpath:/sqlmap/*Mapper.xml"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryAdmin"/>
+        <property name="basePackage" value="innshine.web.official.website.dao"/>
+        <property name="annotationClass" value="innshine.web.official.website.mybatis.MyBatisRepository"/>
+    </bean>
+
+    <bean id="txAdmin"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="db_admin"/>
+        <qualifier value="admin"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="txAdmin"/>
+
+</beans>
